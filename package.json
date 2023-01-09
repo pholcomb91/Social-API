@@ -1,4 +1,14 @@
 {
+  "name": "Social-API",
+  "version": "1.0",
+  "description": "Mongoose back-end for social media",
+  "main": "index.js",
+
+  "scripts": {
+    "seed": "node utils/seed",
+    "start": "node index",
+    "dev": "nodemon index"
+  },
   "dependencies": {
     "express": "^4.18.2",
     "mongoose": "^6.8.2",
