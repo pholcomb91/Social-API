@@ -63,7 +63,7 @@ module.exports = {
         .then((reaction) => {
             return Thought.findOneAndUpdate(
                 { _id: ObjectId(req.body.thoughtId) },
-                { $push: { reactions: reaction._id } },
+                { $addToSet: { reactions: reaction._id } },
                 { new: true }
             )
         })

@@ -52,5 +52,20 @@ module.exports = {
                 res.send(result.deletedCount ? 'User deleted' : 'No user with that ID.');
             }
         ); 
-    }
+    },
+    addFriend( req, res ) {
+        User.findOneAndUpdate(
+            {_id: ObjectId(req.params.userId)},
+            {$addToSet: { friends: User._id }},
+            {new: true}
+        )
+        .then ((user) => 
+            !user
+                ? res.status(404).json({ message: 'No user found by that Id.' })
+                : res.json(user)
+        )
+        .catch ((err) => 
+            res.status(500).json(err)
+        )
+    },
 }
