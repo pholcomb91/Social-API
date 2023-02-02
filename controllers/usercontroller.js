@@ -1,14 +1,14 @@
 const { ObjectId } = require('bson');
-const { User, Thought } = require('../models')
+const { User, Thought} = require('../models');
 
 module.exports = {
     getUsers( req, res ) {
-        User.findAll()
+        User.find()
         .then((users) => res.json(users))
         .catch((err) => res.status(500).json(err));
     },
     getSingleUser(req, res) {
-        User.findOne({ _id: ObjectId(req.params.userId) })
+        User.findOne({ _id: req.params.userId })
         .then((user) =>
             !user
                 ? res.status(404).json({ message: 'No User with that ID' })
@@ -18,19 +18,26 @@ module.exports = {
     },
     createUser( req,res ) {
         User.create({
-            name: req.body.name,
+            userName: req.body.userName,
             email: req.body.email,
             },
             {runValidators: true},
             {new: true},
         )
-        .then((user) => res.json(user))
-        .catch((err) => res.status(500).json(err));
+        .then((user) => {
+            console.log(user)
+            res.json(user)
+        })
+        .catch((err) => {
+            console.log(err)
+            res.status(500).json(err)
+        });
     },
     updateUser( req, res ) {
+        console.log("update User")
         User.findOneAndUpdate(
             {_id: ObjectId(req.params.userId)},
-            {name: req.body.name, email: req.body.email},
+            {userName: req.body.name, email: req.body.email},
             {runValidators: true},
             {new: true}
         )
@@ -45,7 +52,7 @@ module.exports = {
     },
     deleteUser( req, res ) {
         User.deleteOne( 
-            {_id: ObjectId(req.params._id)},
+            {_id: ObjectId(req.params.userId)},
             ( err, result ) => {
                 if (err) throw err;
                 console.log(result);
@@ -53,10 +60,34 @@ module.exports = {
             }
         ); 
     },
+    createThought( req, res ) {
+        console.log("createThought running")
+        Thought.create({
+            thoughtText: req.body.thoughtText
+        })
+        .then((thought) => {
+            console.log(thought);
+            return User.findOneAndUpdate(
+                { _id: ObjectId(req.params.userId) },
+                { $addToSet: { thoughts: thought._id }},
+                { new: true }
+            );
+        })
+        .then((user) =>
+            !user
+                ? res.status(405).json({ message: 'Thought posted but no user with that ID' })
+                : res.json('Success: Posted the Thought!')
+        )
+        .catch((err) => {
+            console.log(err);
+            res.status(500).json(err);
+        });
+    },
     addFriend( req, res ) {
+        console.log("addFriend ran")
         User.findOneAndUpdate(
             {_id: ObjectId(req.params.userId)},
-            {$addToSet: { friends: User._id }},
+            {$addToSet: { friends: req.body.userId }},
             {new: true}
         )
         .then ((user) => 

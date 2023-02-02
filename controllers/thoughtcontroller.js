@@ -3,7 +3,7 @@ const { Thought, User, Reaction } = require('../models');
 
 module.exports = {
     getThoughts(req, res) {
-        Thought.findAll()
+        Thought.find()
         .then((thoughts) => res.json(thoughts))
         .catch((err) => res.status(500).json(err));
     },
@@ -15,25 +15,6 @@ module.exports = {
                 : res.json(post)
         )
         .catch((err) => res.status(500).json(err));
-    },
-    createThought( req, res ) {
-        Thought.create(req.body)
-        .then((thought) => {
-            return User.findOneAndUpdate(
-                { _id: ObjectId(req.params.userId) },
-                { $addToSet: { thoughts: thought._id }},
-                { new: true }
-            );
-        })
-        .then((user) =>
-            !user
-                ? res.status(405).json({ message: 'Thought posted but no user with that ID' })
-                : res.json('Success: Posted the Thought!')
-        )
-        .catch((err) => {
-            console.log(err);
-            res.status(500).json(err);
-        });
     },
     updateThought( req,res ) {
         Thought.findOneAndUpdate(
@@ -49,8 +30,9 @@ module.exports = {
         .catch((err) => res.status(500).json(err));
     },
     deleteThought( req, res ) {
+        console.log(req.params)
         Thought.deleteOne(
-            { _id: ObjectId(req.params.id)},
+            { _id: ObjectId(req.params.thoughtId)},
             (err, result) => {
                 if (err) throw err;
                 console.log(result);
