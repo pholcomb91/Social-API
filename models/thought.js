@@ -2,11 +2,12 @@ const { timeStamp } = require('console');
 const { Schema, model, default: mongoose } = require('mongoose');
 
 const reactionSchema = new mongoose.Schema({
-    reactionId: [{type: Schema.Types.ObjectId, ref: 'id',}],
     reactionBody: {type: String, required: true, minLength: 1, maxLength: 280,},
-    userName: {type: String, required: true},
+    userName: {type: String},
     createdAt: {type: Date, default: Date.now, timestamps: true}
 })
+
+const Reaction = model('reaction', reactionSchema);
 
 const thoughtSchema = new Schema(
     {
@@ -22,7 +23,6 @@ const thoughtSchema = new Schema(
         },
         userName: {
             type: String,
-            required: true
         },
 
         reactions: [reactionSchema],
@@ -42,4 +42,5 @@ thoughtSchema
 
 const Thought = model('thought', thoughtSchema);
 
-module.export = Thought;
+module.exports = Thought;
+module.exports = Reaction;
